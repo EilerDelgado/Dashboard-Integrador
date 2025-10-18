@@ -1,101 +1,125 @@
 import React from "react";
-import SidebarCollapseItem from "./SidebarCollapseItem";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
+import { 
+  Home, 
+  GraduationCap, 
+  BookOpen, 
+  Users, 
+  BarChart3, 
+  Settings,
+  LogOut
+} from "lucide-react";
 
 export default function SideBar() {
-    return (
-        <div id="wrapper">
-            <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-                {/* Brand */}
-                <Link className="sidebar-brand d-flex align-items-center justify-content-center" to="/">
-                    <div className="sidebar-brand-icon rotate-n-15">
-                        <i className="fas fa-graduation-cap" />
-                    </div>
-                    <div className="sidebar-brand-text mx-3">Sistema Educativo</div>
-                </Link>
+  const { usuario, hasRole, logout } = useAuth();
 
-                <hr className="sidebar-divider my-0" />
+  const menuItems = [
+    {
+      icon: Home,
+      title: "Dashboard",
+      to: "/",
+      roles: ["admin", "profesor", "estudiante"]
+    },
+    {
+      icon: GraduationCap,
+      title: "Notas",
+      to: "/notas",
+      roles: ["admin", "profesor", "estudiante"]
+    },
+    {
+      icon: BookOpen,
+      title: "Materias",
+      to: "/materias",
+      roles: ["admin", "profesor"]
+    },
+    {
+      icon: Users,
+      title: "Usuarios",
+      to: "/usuarios",
+      roles: ["admin"]
+    },
+    {
+      icon: BarChart3,
+      title: "Reportes",
+      to: "/reportes",
+      roles: ["admin", "profesor"]
+    }
+  ];
 
-                {/* Dashboard */}
-                <li className="nav-item">
-                    <Link className="nav-link" to="/">
-                        <i className="fas fa-fw fa-tachometer-alt" />
-                        <span>Dashboard</span>
-                    </Link>
-                </li>
-
-                <hr className="sidebar-divider" />
-
-                <div className="sidebar-heading">Módulos Educativos</div>
-
-                <SidebarCollapseItem
-                    icon="fa-user-plus"
-                    title="Ingreso y registro"
-                    items={[
-                        { to: "/estudiantes", text: "Ver Estudiantes" },
-                        { to: "/estudiantes/crear", text: "Crear Estudiante" },
-                    ]}
-                />
-
-                <SidebarCollapseItem
-                    icon="fa-history"
-                    title="Hy estudiantil"
-                    items={[
-                        { to: "/historial", text: "Ver Historial" },
-                        { to: "/historial/crear", text: "Crear Registro" },
-                    ]}
-                />
-
-                <SidebarCollapseItem
-                    icon="fa-users"
-                    title="Módulo Familiar"
-                    items={[
-                        { to: "/familiares", text: "Ver Familiares" },
-                        { to: "/familiares/crear", text: "Crear Familiar" },
-                    ]}
-                />
-
-                <SidebarCollapseItem
-                    icon="fa-clipboard-list"
-                    title="Seguimiento de notas"
-                    items={[
-                        { to: "/notas", text: "Ver Notas" },
-                        { to: "/notas/crear", text: "Registrar Nota" },
-                    ]}
-                />
-
-                <SidebarCollapseItem
-                    icon="fa-calendar-check"
-                    title="Asistencias"
-                    items={[
-                        { to: "/asistencias", text: "Ver Asistencias" },
-                        { to: "/asistencias/crear", text: "Registrar Asistencia" },
-                    ]}
-                />
-
-                <SidebarCollapseItem
-                    icon="fa-heart"
-                    title="Bienestar Estudiantil"
-                    items={[
-                        { to: "/bienestar", text: "Ver Registros" },
-                        { to: "/bienestar/crear", text: "Crear Registro" },
-                    ]}
-                />
-
-                <SidebarCollapseItem
-                    icon="fa-chart-bar"
-                    title="Estadísticas"
-                    items={[
-                        { to: "/estadisticas", text: "Ver Reportes" },
-                    ]}
-                />
-
-                <hr className="sidebar-divider" />
-
-                <div className="text-center d-none d-md-inline">
-                    <button className="rounded-circle border-0" id="sidebarToggle" />
-                </div>
-            </ul>
+  return (
+    <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+      {/* Brand */}
+      <Link className="sidebar-brand d-flex align-items-center justify-content-center" to="/">
+        <div className="sidebar-brand-icon rotate-n-15">
+          <i className="fas fa-graduation-cap" />
         </div>
-    );
+        <div className="sidebar-brand-text mx-3">Dashboard Académico</div>
+      </Link>
+
+      <hr className="sidebar-divider my-0" />
+
+      {/* Navigation Items */}
+      {menuItems.map((item, index) => {
+        if (!hasRole(item.roles)) return null;
+        
+        const IconComponent = item.icon;
+        
+        return (
+          <li key={index} className="nav-item">
+            <Link className="nav-link" to={item.to}>
+              <div className="d-flex align-items-center">
+                <IconComponent size={16} className="me-2" />
+                <span>{item.title}</span>
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+
+      <hr className="sidebar-divider" />
+
+      {/* User Info */}
+      <div className="sidebar-heading">Usuario</div>
+      
+      <li className="nav-item">
+        <div className="nav-link">
+          <div className="d-flex align-items-center">
+            <img
+              src={usuario?.avatar}
+              alt="Avatar"
+              className="rounded-circle me-2"
+              style={{ width: '32px', height: '32px' }}
+            />
+            <div>
+              <div className="text-white small font-weight-bold">
+                {usuario?.nombre} {usuario?.apellido}
+              </div>
+              <div className="text-white-50 small">
+                {usuario?.rol?.charAt(0).toUpperCase() + usuario?.rol?.slice(1)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <li className="nav-item">
+        <button 
+          className="nav-link btn btn-link text-left text-white d-flex align-items-center"
+          onClick={logout}
+          style={{ border: 'none', background: 'none', width: '100%' }}
+        >
+          <LogOut size={16} className="me-2" />
+          <span>Cerrar Sesión</span>
+        </button>
+      </li>
+
+      <hr className="sidebar-divider d-none d-md-block" />
+
+      {/* Sidebar Toggler */}
+      <div className="text-center d-none d-md-inline">
+        <button className="rounded-circle border-0" id="sidebarToggle" />
+      </div>
+    </ul>
+  );
 }
